@@ -51,8 +51,8 @@ ansible-vault encrypt inventory/group_vars/qnap/vault.yml
 In [roles/immich/defaults/main.yml](roles/immich/defaults/main.yml):
 
 ```yaml
-immich_version: "v1.132.3"          # https://github.com/immich-app/immich/releases
-immich_db_image: "ghcr.io/immich-app/postgres:14-vectorchord0.3.0-pgvectors0.2.0"
+immich_version: "v3.1.0"            # https://github.com/immich-app/immich/releases
+immich_db_image: "ghcr.io/immich-app/postgres:14-vectorchord0.4.3-pgvectors0.2.0@sha256:bcf63357191b76a916ae5eb93464d65c07511da41e3bf7a8416db519b40b1c23"
 ```
 
 Das korrekte `immich_db_image`-Tag steht im offiziellen
