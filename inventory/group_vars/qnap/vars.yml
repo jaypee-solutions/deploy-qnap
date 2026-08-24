@@ -1,0 +1,14 @@
+---
+# SSH connection
+ansible_user:              admin
+ansible_shell_executable:  /bin/sh
+ansible_python_interpreter: /share/CACHEDEV1_DATA/.qpkg/Python3/opt/python3/bin/python3
+ansible_become:            false
+
+# Paths
+immich_stack_dir:   /share/Container/immich
+immich_upload_dir:  /share/Immich
+immich_backup_dir:  /share/Container/immich/backups
+
+# Network
+immich_port: 2283

@@ -1,0 +1,56 @@
+# Managed by Ansible — do not edit manually
+# Role: immich | Template: docker-compose.yml.j2
+# Immich version: {{ immich_version }}
+
+services:
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:{{ immich_version }}
+    container_name: immich_server
+    volumes:
+      - {{ immich_upload_dir }}:/usr/src/app/upload
+      - /etc/localtime:/etc/localtime:ro
+    env_file:
+      - .env
+    ports:
+      - "{{ immich_port }}:2283"
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: always
+
+  immich-machine-learning:
+    image: ghcr.io/immich-app/immich-machine-learning:{{ immich_version }}
+    container_name: immich_machine_learning
+    volumes:
+      - model_cache:/cache
+    env_file:
+      - .env
+    restart: always
+
+  redis:
+    image: {{ immich_valkey_image }}
+    container_name: immich_valkey
+    healthcheck:
+      test: valkey-cli ping || exit 1
+    restart: always
+
+  database:
+    image: {{ immich_db_image }}
+    container_name: immich_postgres
+    env_file:
+      - .env
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: >-
+        pg_isready --dbname="{{ immich_db_name }}" --username="{{ immich_db_username }}"
+        || exit 1
+      interval: 10s
+      start_period: 5s
+    restart: always
+
+volumes:
+  model_cache:
+  pgdata:

@@ -1,0 +1,55 @@
+---
+- name: Discover docker binary
+  ansible.builtin.command: which docker
+  register: _docker_which
+  changed_when: false
+  failed_when: false
+
+- name: Set docker binary path
+  ansible.builtin.set_fact:
+    immich_docker_bin: "{{ _docker_which.stdout | trim }}"
+  when: _docker_which.rc == 0 and _docker_which.stdout | trim != ''
+
+- name: Create directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0750"
+  loop:
+    - "{{ immich_stack_dir }}"
+    - "{{ immich_backup_dir }}"
+    - "{{ immich_upload_dir }}"
+
+- name: Deploy docker-compose.yml
+  ansible.builtin.template:
+    src: docker-compose.yml.j2
+    dest: "{{ immich_stack_dir }}/docker-compose.yml"
+    mode: "0640"
+  notify: restart immich
+
+- name: Deploy .env
+  ansible.builtin.template:
+    src: immich.env.j2
+    dest: "{{ immich_stack_dir }}/.env"
+    mode: "0600"
+  notify: restart immich
+
+- name: Deploy backup script
+  ansible.builtin.template:
+    src: immich-backup.sh.j2
+    dest: "{{ immich_stack_dir }}/immich-backup.sh"
+    mode: "0750"
+
+- name: Pull images
+  ansible.builtin.shell:
+    cmd: "{{ immich_docker_bin }} compose pull"
+    chdir: "{{ immich_stack_dir }}"
+  register: pull_result
+  changed_when: "'Pull complete' in pull_result.stdout or 'Downloaded newer image' in pull_result.stdout"
+
+- name: Start stack
+  ansible.builtin.shell:
+    cmd: "{{ immich_docker_bin }} compose up -d --remove-orphans"
+    chdir: "{{ immich_stack_dir }}"
+  register: up_result
+  changed_when: "'Started' in up_result.stdout or 'Recreated' in up_result.stdout or 'Created' in up_result.stdout"

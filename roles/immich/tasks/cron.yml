@@ -1,0 +1,8 @@
+---
+- name: Schedule nightly Immich backup at 03:00
+  ansible.builtin.cron:
+    name: immich-backup
+    minute: "0"
+    hour: "3"
+    job: "{{ immich_stack_dir }}/immich-backup.sh >> {{ immich_backup_dir }}/backup.log 2>&1"
+    state: present

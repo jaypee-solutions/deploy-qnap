@@ -1,0 +1,7 @@
+---
+- name: Deploy / update Immich stack
+  hosts: qnap
+  gather_facts: false
+
+  roles:
+    - role: immich
