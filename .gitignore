@@ -1,2 +1,3 @@
 *.retry
 .envrc.local
+inventory/known_hosts

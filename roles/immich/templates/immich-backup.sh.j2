@@ -1,13 +1,13 @@
-#!/bin/sh
+#!/bin/bash
 # Managed by Ansible — do not edit manually
 # Role: immich | Template: immich-backup.sh.j2
-set -eu
+set -euo pipefail
 
 BACKUP_DIR="{{ immich_backup_dir }}"
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_FILE="${BACKUP_DIR}/immich_db_${TIMESTAMP}.sql.gz"
 
-{{ immich_docker_bin }} exec -t immich_postgres \
+{{ immich_docker_bin }} exec -i immich_postgres \
     pg_dumpall --clean --if-exists \
     --username="{{ immich_db_username }}" \
     | gzip > "${BACKUP_FILE}"
