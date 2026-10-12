@@ -1,5 +1,10 @@
 # Update Log
 
+## 2026-10-12
+
+* **Creation**: Recorded the live QuObjects TLS source, DNS, and blocked
+  certificate-automation decision in the [HTTPS runbook](/operations/quobjects-https.md).
+
 ## 2026-08-24
 
 * **Update**: Recorded the Ansible module-result deserialization caveat and

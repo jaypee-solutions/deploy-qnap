@@ -17,3 +17,4 @@ behavior.
 
 * [Ansible controller](operations/controller.md) - macOS/Linux controller settings and QNAP SSH quirks.
 * [Upgrade gate](operations/upgrade-gate.md) - Evidence required before an Immich version upgrade.
+* [QuObjects HTTPS](operations/quobjects-https.md) - Live TLS provenance, DNS, and recovery prerequisites.
