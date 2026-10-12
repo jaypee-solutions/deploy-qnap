@@ -28,11 +28,12 @@ are `/share/Container/immich`, `/share/Immich`, and
 
 # Configuration
 
-The current defaults target Immich `v3.1.0` with pinned database and Valkey
+The current defaults target Immich `v3.3.1` with pinned database and Valkey
 image digests in [roles/immich/defaults/main.yml](/roles/immich/defaults/main.yml).
-The official `v3.1.0` compose keeps the PostgreSQL/VectorChord image digest
-and uses Valkey digest
-`sha256:8e8d64b405ce18f41b8e5ee20aa4687a8ed0022d1298f2ce31cdcf3a76e09411`.
+The official `v3.3.1` compose keeps the PostgreSQL/VectorChord image
+(`14-vectorchord0.4.3-pgvectors0.2.0`, same digest as `v3.1.0`) and uses Valkey
+digest `sha256:c123e3715db63d06d4ad6964884037aa0d5d4d703939b9929954112889708e1d`.
+Its Valkey health check requires a `PONG` reply, which the role template mirrors.
 The database credentials come from the encrypted
 [vault variables](/inventory/group_vars/qnap/vault.yml); they must never be
 placed in this bundle.
@@ -48,4 +49,4 @@ and the [backup workflow](/deployment/backup.md).
 
 # Citations
 
-[1] [Immich v3.1.0 Docker Compose](https://raw.githubusercontent.com/immich-app/immich/v3.1.0/docker/docker-compose.yml)
+[1] [Immich v3.3.1 Docker Compose](https://raw.githubusercontent.com/immich-app/immich/v3.3.1/docker/docker-compose.yml)

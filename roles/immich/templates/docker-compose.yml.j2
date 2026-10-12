@@ -33,7 +33,7 @@ services:
     image: {{ immich_valkey_image }}
     container_name: immich_valkey
     healthcheck:
-      test: valkey-cli ping || exit 1
+      test: valkey-cli ping | grep -q PONG || exit 1
     restart: always
 
   database:

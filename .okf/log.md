@@ -2,6 +2,8 @@
 
 ## 2026-10-12
 
+* **Update**: Prepared the Immich `v3.1.0` to `v3.3.1` update with the new
+  Valkey digest and health check in the [stack concept](/deployment/stack.md).
 * **Creation**: Documented the TruffleHog and ansible-lint workflows and lint
   baseline in the [CI checks runbook](/operations/ci-checks.md).
 * **Creation**: Recorded the live QuObjects TLS source, DNS, and blocked
