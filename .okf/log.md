@@ -2,6 +2,8 @@
 
 ## 2026-10-12
 
+* **Creation**: Documented the TruffleHog and ansible-lint workflows and lint
+  baseline in the [CI checks runbook](/operations/ci-checks.md).
 * **Creation**: Recorded the live QuObjects TLS source, DNS, and blocked
   certificate-automation decision in the [HTTPS runbook](/operations/quobjects-https.md).
 * **Update**: Recorded the `10.10.0.10` DNS change and the additive DNS-01
