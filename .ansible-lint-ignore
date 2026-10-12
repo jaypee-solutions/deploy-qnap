@@ -1,0 +1,15 @@
+# This file contains ignores rule violations for ansible-lint
+immich-backup.yml command-instead-of-shell
+immich-backup.yml no-changed-when
+inventory/group_vars/qnap/vars.yml yaml[colons]
+roles/immich/defaults/main.yml yaml[colons]
+roles/immich/handlers/main.yml command-instead-of-shell
+roles/immich/handlers/main.yml name[casing]
+roles/immich/handlers/main.yml no-changed-when
+roles/immich/tasks/install.yml command-instead-of-shell
+roles/immich/tasks/install.yml var-naming[no-role-prefix]
+roles/immich/tasks/main.yml fqcn[action-core]
+roles/immich/tasks/main.yml name[missing]
+roles/quobjects_proxy/tasks/main.yml no-changed-when
+roles/quobjects_proxy/tasks/main.yml risky-shell-pipe
+roles/quobjects_proxy/tasks/main.yml yaml[line-length]
