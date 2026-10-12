@@ -36,6 +36,12 @@ dropping iOS 14 support. The official `v3.1.0` compose keeps this deployment's
 PostgreSQL/VectorChord image and changes the Valkey digest, so the prepared
 change is limited to the Immich version and Valkey image pin.
 
+On 2026-10-12 the `v3.1.0` to `v3.3.1` update (`v3.3.1` released 2026-10-08;
+no breaking changes listed in `v3.2.0`, `v3.3.0`, or `v3.3.1`) was prepared. The
+official `v3.3.1` compose keeps the same PostgreSQL/VectorChord image digest
+and changes the Valkey digest and health check. The gate still applies: run
+and verify the backup before running the install playbook.
+
 # Related concepts
 
 The [Immich stack](/deployment/stack.md) defines the managed version and image

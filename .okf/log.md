@@ -2,6 +2,8 @@
 
 ## 2026-10-12
 
+* **Update**: Prepared the Immich `v3.1.0` to `v3.3.1` update with the new
+  Valkey digest and health check in the [stack concept](/deployment/stack.md).
 * **Creation**: Recorded the live QuObjects TLS source, DNS, and blocked
   certificate-automation decision in the [HTTPS runbook](/operations/quobjects-https.md).
 * **Update**: Recorded the `10.10.0.10` DNS change and the additive DNS-01
