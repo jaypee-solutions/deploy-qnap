@@ -1,14 +1,14 @@
 # ADR 0001: Do not automate QTS certificate replacement without a supported import path
 
-- Status: Blocked pending a safe installation/renewal mechanism
+- Status: Accepted for QTS; NAS-local proxy alternative in [ADR 0002](0002-quobjects-dns01-tls-proxy.md)
 - Date: 2026-10-12
 
 ## Context
 
-The intended QuObjects S3 name is `qnap.4jp.de`. Public DNS returns the private
-address `10.10.0.6`, which is an interface on the NAS; its `10.10.0.10` address
-also serves QuObjects on port 8010. DNS and routing from k0s have **not** been
-verified because no cluster access path is available.
+The intended QuObjects S3 name is `qnap.4jp.de`. At the initial assessment,
+public DNS returned the NAS's `10.10.0.6` address. It was subsequently changed
+to `10.10.0.10`; the NAS owns both addresses. DNS and routing from k0s have
+**not** been verified because no cluster access path is available.
 
 Read-only inspection of QTS 5.2.10 (build 20260731) and the QuObjects package
 (`OSS` 2.5.869) established the actual certificate path:
@@ -37,11 +37,12 @@ web CGI would bypass its validation and recovery path.
 
 ## Decision
 
-**Stop before issuance, import, restart, or renewal automation.** Do not build
-an unsupported QTS-certificate writer, modify the Swift PEM in place, or
-configure S3 clients to disable TLS verification. No certificate was replaced
-and no renewal job was installed. A renewed certificate must be proven to be
-served by **port 8010**, not inferred from QTS's port 443.
+**Do not automate a QTS/Swift certificate replacement.** Do not build an
+unsupported QTS-certificate writer, modify the Swift PEM in place, or
+configure S3 clients to disable TLS verification. No QTS/Swift certificate
+was replaced; a future direct-certificate replacement must be proven to be
+served by **port 8010**, not inferred from QTS's port 443. This decision does
+not prohibit the isolated DNS-01 proxy deployed under [ADR 0002](0002-quobjects-dns01-tls-proxy.md).
 
 A supported, isolated TLS/S3 endpoint with DNS-01 and verified upstream
 identity is the preferred automation alternative if QNAP cannot provide a safe

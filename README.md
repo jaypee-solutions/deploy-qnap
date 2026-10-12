@@ -77,6 +77,41 @@ ansible-playbook immich-backup.yml
 
 Immich ist danach erreichbar unter `http://192.168.178.60:2283`.
 
+## QuObjects HTTPS
+
+Der separate Proxy stellt den verifizierbaren S3-Endpunkt unter
+`https://qnap.4jp.de:8443` bereit. Port `8010` bleibt als direkter
+QuObjects-Zugang erreichbar und trägt weiterhin das selbstsignierte
+QNAP-Zertifikat; Backup-Clients dürfen ihn nicht verwenden. Die
+[Proxy-Entscheidung](docs/adr/0002-quobjects-dns01-tls-proxy.md)
+beschreibt DNS-01, die geprüfte lokale Weiterleitung und die Grenzen des
+QNAP-Zertifikats. Die Rolle ersetzt **kein** QTS-Zertifikat. Vor **jedem**
+Deployment zuerst die Vorschau prüfen und die NAS-Änderung freigeben lassen;
+der SSH-Zugang kann eine biometrische Freigabe verlangen:
+
+```bash
+env -u ANSIBLE_VAULT_PASSWORD_FILE ANSIBLE_LOCAL_TEMP=/private/tmp/ansible-local \
+  ansible-playbook --check --diff quobjects-proxy-install.yml
+env -u ANSIBLE_VAULT_PASSWORD_FILE ANSIBLE_LOCAL_TEMP=/private/tmp/ansible-local \
+  ansible-playbook quobjects-proxy-install.yml
+curl https://qnap.4jp.de:8443/healthcheck
+```
+
+Nur bei Erstinstallation oder expliziter Token-Rotation liest die Rolle den
+Cloudflare-DNS-01-Token über 1Password (Biometrie möglich). Der bestehende
+Token bleibt auf dem NAS als `0600`-Datei für Caddys automatische Erneuerung;
+mit `-e quobjects_proxy_refresh_dns_token=true` wird er nach einer Rotation
+erneut aus 1Password gelesen. Da diese Rolle keine Vault-Variablen verwendet,
+deaktivieren die obigen Kommandos ausschließlich den sonst automatisch
+gestarteten Vault-Passwort-Helper; `ansible.cfg` bleibt unverändert. Nach jeder
+Änderung SAN, Aussteller, Ablaufdatum und HTTPS ohne Zertifikats-Bypass prüfen,
+auch aus dem k0s-Netz. Die Erst-Ausstellung war erfolgreich; eine spätere
+automatische Erneuerung wurde noch nicht beobachtet. Bei fehlgeschlagener
+Erneuerung Backup-Clients pausieren statt auf Port `8010` zurückzufallen.
+Die [Proxy-Entscheidung](docs/adr/0002-quobjects-dns01-tls-proxy.md)
+beschreibt Fehlerbehebung und den Rückbau ausschließlich dieses
+Compose-Projekts. Die Rolle installiert keine Kubernetes-Backup-Clients.
+
 ## Backup
 
 Der nächtliche Backup-Cron läuft um **03:00 Uhr** auf der QNAP

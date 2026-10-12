@@ -1,0 +1,13 @@
+{
+	admin off
+	auto_https disable_redirects
+}
+
+https://{{ quobjects_proxy_name }}:{{ quobjects_proxy_port }} {
+	bind {{ quobjects_proxy_address }}
+	tls {
+		dns cloudflare {env.CF_API_TOKEN}
+		resolvers 1.1.1.1
+	}
+	reverse_proxy 127.0.0.1:{{ quobjects_proxy_internal_port }}
+}

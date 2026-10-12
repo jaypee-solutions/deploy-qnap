@@ -1,0 +1,16 @@
+---
+quobjects_proxy_dir: /share/Container/quobjects-proxy
+quobjects_proxy_name: qnap.4jp.de
+quobjects_proxy_address: 10.10.0.10
+quobjects_proxy_port: 8443
+quobjects_proxy_internal_port: 18010
+quobjects_proxy_upstream_port: 8010
+quobjects_proxy_upstream_fingerprint: "5D:39:98:B8:A7:B4:C4:14:7A:76:14:12:9A:EA:FA:D4:FE:66:20:24:B3:AF:B6:45:4A:48:A5:19:A5:EE:40:F4"
+quobjects_proxy_cloudflare_token_ref: op://Homelab/b6i34pfgjitlzneedilxq47lxa/password
+quobjects_proxy_refresh_dns_token: false
+quobjects_proxy_force_recreate: false
+quobjects_proxy_docker_bin: /share/CACHEDEV1_DATA/.qpkg/container-station/bin/docker
+quobjects_proxy_haproxy_image: "haproxy:3.2-alpine@sha256:168a5e3984df24054946c94fb7d29d785c7ed1af8ce11ea4b33253221c8c85c8"
+quobjects_proxy_caddy_builder_image: "caddy:2.10.2-builder@sha256:40aa5af183f83631ca8566ca076a1c05d14c02311d7a3e8fad9374c45d3574f6"
+quobjects_proxy_caddy_runtime_image: "caddy:2.10.2@sha256:d8c17a862962def15cde69863a3a463f25a2664942eafd7bdbf050e9c3116b83"
+quobjects_proxy_cloudflare_module: github.com/caddy-dns/cloudflare@v0.2.4

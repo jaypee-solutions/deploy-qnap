@@ -1,0 +1,7 @@
+---
+- name: Deploy verified QuObjects HTTPS proxy
+  hosts: qnap
+  gather_facts: false
+
+  roles:
+    - quobjects_proxy

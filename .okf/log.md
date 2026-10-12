@@ -4,6 +4,12 @@
 
 * **Creation**: Recorded the live QuObjects TLS source, DNS, and blocked
   certificate-automation decision in the [HTTPS runbook](/operations/quobjects-https.md).
+* **Update**: Recorded the `10.10.0.10` DNS change and the additive DNS-01
+  proxy design with pinned QuObjects upstream verification in the
+  [HTTPS runbook](/operations/quobjects-https.md).
+* **Update**: Verified the live Let's Encrypt SAN/chain on port 8443 and
+  documented the pending k0s and first-renewal checks in the
+  [HTTPS runbook](/operations/quobjects-https.md).
 
 ## 2026-08-24
 

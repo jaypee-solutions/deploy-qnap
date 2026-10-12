@@ -1,0 +1,15 @@
+global
+    log stdout format raw local0
+
+defaults
+    mode http
+    timeout connect 5s
+    timeout client 1h
+    timeout server 1h
+
+frontend from_caddy
+    bind 127.0.0.1:{{ quobjects_proxy_internal_port }}
+    default_backend quobjects
+
+backend quobjects
+    server swift 127.0.0.1:{{ quobjects_proxy_upstream_port }} ssl verify required ca-file /usr/local/etc/haproxy/upstream.pem check

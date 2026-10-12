@@ -1,0 +1,6 @@
+FROM {{ quobjects_proxy_caddy_builder_image }} AS builder
+RUN xcaddy build --with {{ quobjects_proxy_cloudflare_module }}
+
+FROM {{ quobjects_proxy_caddy_runtime_image }}
+COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+RUN setcap -r /usr/bin/caddy

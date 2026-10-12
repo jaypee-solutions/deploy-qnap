@@ -1,0 +1,159 @@
+---
+- name: Read QuObjects' public TLS certificate over NAS loopback
+  ansible.builtin.shell:
+    cmd: openssl s_client -connect 127.0.0.1:8010 -showcerts </dev/null 2>/dev/null | openssl x509 -outform PEM
+  register: quobjects_proxy_upstream_cert
+  changed_when: false
+  check_mode: false
+
+- name: Calculate QuObjects certificate fingerprint
+  ansible.builtin.command:
+    argv:
+      - openssl
+      - x509
+      - -noout
+      - -fingerprint
+      - -sha256
+    stdin: "{{ quobjects_proxy_upstream_cert.stdout }}"
+  register: quobjects_proxy_live_fingerprint
+  changed_when: false
+  check_mode: false
+
+- name: Refuse an unapproved QuObjects upstream certificate
+  ansible.builtin.assert:
+    that:
+      - quobjects_proxy_live_fingerprint.stdout | trim == 'sha256 Fingerprint=' ~ quobjects_proxy_upstream_fingerprint
+    fail_msg: QuObjects' certificate changed; review and approve the new public fingerprint before deploying.
+
+- name: Locate Container Station Docker
+  ansible.builtin.command: which docker
+  register: quobjects_proxy_docker_lookup
+  changed_when: false
+  failed_when: false
+  check_mode: false
+
+- name: Use Docker from the NAS path if available
+  ansible.builtin.set_fact:
+    quobjects_proxy_docker_bin: "{{ quobjects_proxy_docker_lookup.stdout | trim }}"
+  when: quobjects_proxy_docker_lookup.rc == 0 and quobjects_proxy_docker_lookup.stdout | trim != ''
+
+- name: Check Docker executable
+  ansible.builtin.stat:
+    path: "{{ quobjects_proxy_docker_bin }}"
+    follow: true
+  register: quobjects_proxy_docker_stat
+
+- name: Require Docker on the NAS
+  ansible.builtin.assert:
+    that:
+      - quobjects_proxy_docker_stat.stat.executable | default(false)
+
+- name: Check whether the DNS token is already installed
+  ansible.builtin.stat:
+    path: "{{ quobjects_proxy_dir }}/.env"
+  register: quobjects_proxy_existing_token
+
+- name: Refuse a nonregular DNS token file
+  ansible.builtin.assert:
+    that:
+      - quobjects_proxy_existing_token.stat.isreg | default(false)
+  when: quobjects_proxy_existing_token.stat.exists
+
+- name: Read scoped Cloudflare token from 1Password on the controller
+  ansible.builtin.set_fact:
+    quobjects_proxy_cloudflare_token: "{{ lookup('ansible.builtin.pipe', 'op read ' ~ (quobjects_proxy_cloudflare_token_ref | quote)) }}"
+  no_log: true
+  when: not quobjects_proxy_existing_token.stat.exists or quobjects_proxy_refresh_dns_token | bool
+
+- name: Require a nonempty Cloudflare token
+  ansible.builtin.assert:
+    that:
+      - quobjects_proxy_cloudflare_token | trim | length > 0
+  no_log: true
+  when: not quobjects_proxy_existing_token.stat.exists or quobjects_proxy_refresh_dns_token | bool
+
+- name: Create private proxy storage
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0700'
+  loop:
+    - "{{ quobjects_proxy_dir }}"
+    - "{{ quobjects_proxy_dir }}/data"
+    - "{{ quobjects_proxy_dir }}/config"
+
+- name: Pin the reviewed QuObjects public certificate
+  ansible.builtin.copy:
+    content: "{{ quobjects_proxy_upstream_cert.stdout }}\n"
+    dest: "{{ quobjects_proxy_dir }}/upstream.pem"
+    mode: '0644'
+  diff: false
+  register: quobjects_proxy_trust_anchor
+
+- name: Install nonsecret proxy configuration
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ quobjects_proxy_dir }}/{{ item.dest }}"
+    mode: '0644'
+  loop:
+    - {src: Dockerfile.caddy.j2, dest: Dockerfile.caddy}
+    - {src: Caddyfile.j2, dest: Caddyfile}
+    - {src: haproxy.cfg.j2, dest: haproxy.cfg}
+    - {src: docker-compose.yml.j2, dest: docker-compose.yml}
+  register: quobjects_proxy_configuration
+
+- name: Store scoped DNS token for runtime renewal
+  ansible.builtin.template:
+    src: proxy.env.j2
+    dest: "{{ quobjects_proxy_dir }}/.env"
+    mode: '0600'
+  no_log: true
+  when: not quobjects_proxy_existing_token.stat.exists or quobjects_proxy_refresh_dns_token | bool
+  register: quobjects_proxy_secret_file
+
+- name: Keep the existing DNS token restricted
+  ansible.builtin.file:
+    path: "{{ quobjects_proxy_dir }}/.env"
+    state: file
+    mode: '0600'
+  when: quobjects_proxy_existing_token.stat.exists
+
+- name: Determine whether mounted files require container recreation
+  ansible.builtin.set_fact:
+    quobjects_proxy_recreate_containers: "{{ (quobjects_proxy_force_recreate | bool) or quobjects_proxy_trust_anchor.changed or quobjects_proxy_configuration.changed or (quobjects_proxy_secret_file.changed | default(false)) }}"
+
+- name: Preview proxy container action
+  ansible.builtin.debug:
+    msg: "{{ 'Recreate' if quobjects_proxy_recreate_containers else 'Ensure' }} only the QuObjects proxy containers; QTS and QuObjects listeners remain unchanged."
+
+- name: Validate Compose configuration before starting proxy
+  ansible.builtin.command:
+    argv:
+      - "{{ quobjects_proxy_docker_bin }}"
+      - compose
+      - config
+      - --quiet
+    chdir: "{{ quobjects_proxy_dir }}"
+  changed_when: false
+  no_log: true
+  when: not ansible_check_mode
+
+- name: Build and start the isolated proxy stack
+  ansible.builtin.command:
+    argv: "{{ [quobjects_proxy_docker_bin, 'compose', 'up', '-d', '--build'] + (['--force-recreate'] if quobjects_proxy_recreate_containers else []) }}"
+    chdir: "{{ quobjects_proxy_dir }}"
+  no_log: true
+  when: not ansible_check_mode
+
+- name: Verify public HTTPS through the new endpoint
+  ansible.builtin.uri:
+    url: "https://{{ quobjects_proxy_name }}:{{ quobjects_proxy_port }}/healthcheck"
+    validate_certs: true
+    use_proxy: false
+    status_code: 200
+  delegate_to: localhost
+  register: quobjects_proxy_https_check
+  until: quobjects_proxy_https_check.status | default(0) == 200
+  retries: 20
+  delay: 15
+  when: not ansible_check_mode

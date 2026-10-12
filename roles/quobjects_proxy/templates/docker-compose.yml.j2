@@ -1,0 +1,35 @@
+services:
+  caddy:
+    build:
+      context: {{ quobjects_proxy_dir }}
+      dockerfile: Dockerfile.caddy
+    image: quobjects-caddy:2.10.2-cloudflare-0.2.4
+    network_mode: host
+    env_file: .env
+    volumes:
+      - {{ quobjects_proxy_dir }}/Caddyfile:/etc/caddy/Caddyfile:ro
+      - {{ quobjects_proxy_dir }}/data:/data
+      - {{ quobjects_proxy_dir }}/config:/config
+    depends_on:
+      - haproxy
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+
+  haproxy:
+    image: {{ quobjects_proxy_haproxy_image }}
+    network_mode: host
+    volumes:
+      - {{ quobjects_proxy_dir }}/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
+      - {{ quobjects_proxy_dir }}/upstream.pem:/usr/local/etc/haproxy/upstream.pem:ro
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
