@@ -2,6 +2,9 @@
 
 ## 2026-10-12
 
+* **Update**: Recorded the applied `v3.3.1` upgrade, the transient pull failure,
+  and the missing fresh pre-upgrade dump in the
+  [upgrade gate](/operations/upgrade-gate.md).
 * **Update**: Prepared the Immich `v3.1.0` to `v3.3.1` update with the new
   Valkey digest and health check in the [stack concept](/deployment/stack.md).
 * **Creation**: Documented the TruffleHog and ansible-lint workflows and lint

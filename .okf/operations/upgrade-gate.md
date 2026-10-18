@@ -42,6 +42,16 @@ official `v3.3.1` compose keeps the same PostgreSQL/VectorChord image digest
 and changes the Valkey digest and health check. The gate still applies: run
 and verify the backup before running the install playbook.
 
+The update was applied the same day. The first `docker compose pull` failed with
+a transient registry `toomanyrequests` error (`rc=18`); a retry succeeded. At
+20:11 the `immich-server`, `machine-learning`, `postgres`, and `valkey`
+containers all reported healthy on `v3.3.1`. The newest dump in the backup
+directory was still `immich_db_20260824_064348.sql.gz` (386,481,057 bytes), so
+the gate was not satisfied by a fresh pre-upgrade dump and no pre-upgrade
+restore point exists. The nightly cron backup also appears not to have produced
+dumps since then (`backup.log` last modified 2026-07-28); the cause is not yet
+investigated.
+
 # Related concepts
 
 The [Immich stack](/deployment/stack.md) defines the managed version and image
