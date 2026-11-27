@@ -59,6 +59,12 @@ Valkey digest, and adds `MACHINE_LEARNING_MODEL_REVISION=v2`, which this
 deployment adopts. The gate applies: run and verify the backup before running
 the install playbook.
 
+The `v3.4.2` update was applied the same day after a verified fresh dump
+(`immich_db_20261127_093939.sql.gz`, 396,585,850 bytes, `gzip -t` passed). The
+server reported `3.4.2`, all four containers were healthy, and the ML container
+ran with `MACHINE_LEARNING_MODEL_REVISION=v2`. The `immich_postgres` logs
+showed no `invalid input syntax for type vector` errors in the first hour.
+
 # Related concepts
 
 The [Immich stack](/deployment/stack.md) defines the managed version and image

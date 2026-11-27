@@ -3,7 +3,7 @@ type: Runbook
 title: Immich PostgreSQL backup workflow
 description: The role generates a compressed pg_dumpall backup script and schedules it nightly on the QNAP.
 tags: [immich, backup, postgres, qnap, recovery]
-timestamp: 2026-08-23T00:00:00+02:00
+timestamp: 2026-11-27T12:00:00+01:00
 ---
 
 # Entry points
@@ -34,6 +34,13 @@ entry does not establish that a restorable backup exists.
 A readiness check on 2026-07-26 found the managed backup directory empty and no
 `immich-backup` cron entry on the live QNAP. That is historical evidence only;
 recheck the live target before relying on the backup workflow.
+
+Before the `v3.3.1` to `v3.4.2` upgrade on 2026-11-27, the on-demand playbook
+produced `immich_db_20261127_093939.sql.gz` (396,585,850 bytes, written
+2026-11-27 09:44 on the QNAP, `gzip -t` passed). The install playbook then
+re-created the `03:00` cron entry (reported `changed`, so it was missing or
+different); `backup.log` shows its last successful nightly runs on
+2026-07-28 and 2026-10-13. Confirm the next nightly run produced a dump.
 
 # Related concepts
 

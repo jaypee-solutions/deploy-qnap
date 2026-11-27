@@ -6,6 +6,11 @@
   Valkey digest in the [stack concept](/deployment/stack.md).
 * **Creation**: Added ADR 0004 adopting `MACHINE_LEARNING_MODEL_REVISION=v2`;
   documented in the [stack concept](/deployment/stack.md).
+* **Update**: Deployed Immich `v3.4.2` after a verified 396,585,850-byte
+  pre-upgrade dump; all four containers healthy, ML revision `v2` active, no
+  `invalid input syntax for type vector` errors (see the
+  [upgrade gate](/operations/upgrade-gate.md) and
+  [backup workflow](/deployment/backup.md)).
 
 ## 2026-10-12
 
