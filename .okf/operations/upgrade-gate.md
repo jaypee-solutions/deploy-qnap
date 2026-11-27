@@ -3,7 +3,7 @@ type: Decision
 title: Immich upgrade gate
 description: A verified non-empty PostgreSQL dump is required before applying an Immich version update.
 tags: [immich, upgrade, backup, safety, qnap]
-timestamp: 2026-08-23T21:32:04+02:00
+timestamp: 2026-11-27T12:00:00+01:00
 ---
 
 # Decision
@@ -52,6 +52,19 @@ restore point exists. The nightly cron backup also appears not to have produced
 dumps since then (`backup.log` last modified 2026-07-28); the cause is not yet
 investigated.
 
+On 2026-11-27 the `v3.3.1` to `v3.4.2` update (`v3.4.2` released 2026-11-18; no
+breaking changes listed in `v3.3.3` through `v3.4.2`) was prepared. The official
+`v3.4.2` compose keeps the same PostgreSQL/VectorChord image digest, changes the
+Valkey digest, and adds `MACHINE_LEARNING_MODEL_REVISION=v2`, which this
+deployment adopts. The gate applies: run and verify the backup before running
+the install playbook.
+
+The `v3.4.2` update was applied the same day after a verified fresh dump
+(`immich_db_20261127_093939.sql.gz`, 396,585,850 bytes, `gzip -t` passed). The
+server reported `3.4.2`, all four containers were healthy, and the ML container
+ran with `MACHINE_LEARNING_MODEL_REVISION=v2`. The `immich_postgres` logs
+showed no `invalid input syntax for type vector` errors in the first hour.
+
 # Related concepts
 
 The [Immich stack](/deployment/stack.md) defines the managed version and image
@@ -65,3 +78,5 @@ Ansible/SSH failures that must be resolved before running the backup.
 [2] [Immich upgrade documentation](https://docs.immich.app/install/upgrading/)
 
 [3] [Immich v3.1.0 Docker Compose](https://raw.githubusercontent.com/immich-app/immich/v3.1.0/docker/docker-compose.yml)
+
+[4] [Immich v3.4.2 release notes](https://github.com/immich-app/immich/releases/tag/v3.4.2)
