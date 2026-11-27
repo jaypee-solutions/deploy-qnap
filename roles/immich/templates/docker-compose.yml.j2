@@ -27,6 +27,8 @@ services:
       - model_cache:/cache
     env_file:
       - .env
+    environment:
+      MACHINE_LEARNING_MODEL_REVISION: "{{ immich_ml_model_revision }}"
     restart: always
 
   redis:

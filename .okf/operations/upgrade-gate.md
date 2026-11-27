@@ -3,7 +3,7 @@ type: Decision
 title: Immich upgrade gate
 description: A verified non-empty PostgreSQL dump is required before applying an Immich version update.
 tags: [immich, upgrade, backup, safety, qnap]
-timestamp: 2026-08-23T21:32:04+02:00
+timestamp: 2026-11-27T12:00:00+01:00
 ---
 
 # Decision
@@ -42,6 +42,13 @@ official `v3.3.1` compose keeps the same PostgreSQL/VectorChord image digest
 and changes the Valkey digest and health check. The gate still applies: run
 and verify the backup before running the install playbook.
 
+On 2026-11-27 the `v3.3.1` to `v3.4.2` update (`v3.4.2` released 2026-11-18; no
+breaking changes listed in `v3.3.3` through `v3.4.2`) was prepared. The official
+`v3.4.2` compose keeps the same PostgreSQL/VectorChord image digest, changes the
+Valkey digest, and adds `MACHINE_LEARNING_MODEL_REVISION=v2`, which this
+deployment adopts. The gate applies: run and verify the backup before running
+the install playbook.
+
 # Related concepts
 
 The [Immich stack](/deployment/stack.md) defines the managed version and image
@@ -55,3 +62,5 @@ Ansible/SSH failures that must be resolved before running the backup.
 [2] [Immich upgrade documentation](https://docs.immich.app/install/upgrading/)
 
 [3] [Immich v3.1.0 Docker Compose](https://raw.githubusercontent.com/immich-app/immich/v3.1.0/docker/docker-compose.yml)
+
+[4] [Immich v3.4.2 release notes](https://github.com/immich-app/immich/releases/tag/v3.4.2)
